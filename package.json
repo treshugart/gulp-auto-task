@@ -1,0 +1,31 @@
+{
+  "name": "gulp-auto-task",
+  "version": "0.0.0",
+  "description": "Automatically create gulp tasks from node modules from a glob pattern.",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/treshugart/gulp-auto-task"
+  },
+  "keywords": [
+    "gulp",
+    "task",
+    "tasks",
+    "auto",
+    "automatic",
+    "generate",
+    "glob"
+  ],
+  "author": "Trey Shugart <treshugart@gmail.com> (http://treshugart.github.io)",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/treshugart/gulp-auto-task/issues"
+  },
+  "homepage": "https://github.com/treshugart/gulp-auto-task",
+  "devDependencies": {
+    "glob": "^4.4.0"
+  }
+}
