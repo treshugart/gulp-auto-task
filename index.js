@@ -4,7 +4,7 @@ var glob = require('glob');
 var gulp = require('gulp');
 var path = require('path');
 
-module.exports = function (gulp, pattern, options) {
+module.exports = function (pattern, options) {
     options = options || {};
     options = {
         base: path.resolve(options.base || './')
