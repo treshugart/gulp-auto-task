@@ -25,7 +25,8 @@
     "url": "https://github.com/treshugart/gulp-auto-task/issues"
   },
   "homepage": "https://github.com/treshugart/gulp-auto-task",
-  "devDependencies": {
-    "glob": "^4.4.0"
+  "devDependencies": {},
+  "dependencies": {
+    "glob": "^4.4.1"
   }
 }
