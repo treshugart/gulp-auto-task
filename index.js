@@ -19,7 +19,7 @@ module.exports = function (options) {
       if (fs.existsSync(baseTaskJs)) {
         var taskFunc = require(baseTask);
 
-        if (taskFunc.private === true) {
+        if (taskFunc.private) {
           return;
         }
 

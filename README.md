@@ -78,12 +78,12 @@ Mac gives you a way to chain a bunch of Gulp streams in parallel, or in series, 
 
 Check out the [build example](https://github.com/treshugart/mac#build-example) for more information.
 
-### Opt-out
+### Private Tasks
 
-If you have some tasks in your build directory that you do not want auto-tasked (they may not conform to the gulp-auto-task convention), set `module.exports.autotask` to `false`, ie
+If you have some tasks in your build directory that you do not want auto-tasked (they may not conform to the gulp-auto-task convention), set `module.exports.autotask` to `false`, ie:
 
 ```js
-module.exports.autotask = false;
+module.exports.private = true;
 ```
 
 You can then use regular gulp tasks and auto-gulp-task's simultaneously.
