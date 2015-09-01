@@ -1,6 +1,6 @@
 {
   "name": "gulp-auto-task",
-  "version": "0.0.1",
+  "version": "0.1.0-dev",
   "description": "Automatically create gulp tasks from node modules from a glob pattern.",
   "main": "index.js",
   "scripts": {

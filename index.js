@@ -17,8 +17,18 @@ module.exports = function (options) {
       var baseTask = path.join(process.cwd(), base, task);
       var baseTaskJs = baseTask + '.js';
       if (fs.existsSync(baseTaskJs)) {
-        gulp.task(task, function () {
-          return require(baseTask)(argv);
+        var taskFunc = require(baseTask);
+
+        if (taskFunc.private === true) {
+          return;
+        }
+
+        if (!taskFunc.dependencies) {
+          taskFunc.dependencies = [];
+        }
+
+        gulp.task(task, taskFunc.dependencies, function () {
+          return taskFunc(argv);
         });
       }
     });
