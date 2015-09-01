@@ -12,6 +12,11 @@ module.exports = function (pattern, options) {
 
     glob.sync(path.join(options.base, pattern)).forEach(function (file) {
         var task = require(file);
+
+        if (task.autotask === false) {
+            return;
+        }
+
         var name = file.replace(options.base + '/', '').replace('.js', '');
         gulp.task(name, task.deps || task, task.deps ? task : undefined);
     });
