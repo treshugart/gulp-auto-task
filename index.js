@@ -1,6 +1,34 @@
 var argv = require('minimist')(process.argv.slice(2));
-var fs = require('fs');
 var path = require('path');
+
+function loadTask (gulp, taskName, taskPath) {
+  try {
+    var taskFunc = require(taskPath);
+  } catch (e) {
+    throw new Error ('could not load task "' + taskName + '"');
+  }
+
+  if (taskFunc.private) {
+    return;
+  }
+
+  if (!taskFunc.dependencies) {
+    taskFunc.dependencies = [];
+  }
+
+  taskFunc.dependencies.forEach(function (depPath) {
+    var depRealPath = path.join(path.dirname(taskPath), depPath);
+    try {
+      loadTask(gulp, depPath, depRealPath);
+    } catch (e) {
+      throw new Error('could not load task dependency "' + depPath + '" for "' + taskName + '"');
+    }
+  });
+
+  gulp.task(taskName, taskFunc.dependencies, function () {
+    return taskFunc(argv);
+  });
+}
 
 module.exports = function (options) {
   options = options || {};
@@ -12,24 +40,13 @@ module.exports = function (options) {
     bases = [bases];
   }
 
-  tasks.forEach(function (task) {
-    bases.forEach(function (base) {
-      var baseTask = path.join(process.cwd(), base, task);
-      var baseTaskJs = baseTask + '.js';
-      if (fs.existsSync(baseTaskJs)) {
-        var taskFunc = require(baseTask);
-
-        if (taskFunc.private) {
-          return;
-        }
-
-        if (!taskFunc.dependencies) {
-          taskFunc.dependencies = [];
-        }
-
-        gulp.task(task, taskFunc.dependencies, function () {
-          return taskFunc(argv);
-        });
+  tasks.forEach(function (taskName) {
+    bases.forEach(function (basePath) {
+      var taskPath = path.join(process.cwd(), basePath, taskName);
+      try {
+        loadTask(gulp, taskName, taskPath);
+      } catch (e) {
+        throw e;
       }
     });
   });
