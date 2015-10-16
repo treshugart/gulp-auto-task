@@ -25,9 +25,15 @@ function loadTask (gulp, taskName, taskPath) {
     }
   });
 
-  gulp.task(taskName, taskFunc.dependencies, function () {
-    return taskFunc(argv);
-  });
+  if (taskFunc.length > 1) {
+    gulp.task(taskName, taskFunc.dependencies, function (done) {
+      return taskFunc(argv, done);
+    });
+  } else {
+    gulp.task(taskName, taskFunc.dependencies, function () {
+      return taskFunc(argv);
+    });
+  }
 }
 
 module.exports = function (options) {
