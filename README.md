@@ -72,6 +72,17 @@ However, this is not recommended. Why you ask? Because:
 
 If you don't mind those things, that's cool. It's there for you to use. But... there's a better way.
 
+### Defining async tasks
+
+You can define async tasks like this:
+
+```js
+function myAsyncTask (opts, done) {
+  // async tasky task
+  done();
+}
+```
+
 ### Using with [mac](https://github.com/treshugart/mac)
 
 Mac gives you a way to chain a bunch of Gulp streams in parallel, or in series, using only the task function you've defined. The only thing you've got to make sure that you do is to return your stream from your task and it can be reused wherever.
