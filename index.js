@@ -1,11 +1,13 @@
 var argv = require('minimist')(process.argv.slice(2));
 var path = require('path');
+var gutil = require('gulp-util');
 
 function loadTask (gulp, taskName, taskPath) {
   try {
     var taskFunc = require(taskPath);
   } catch (e) {
-    throw new Error ('could not load task "' + taskName + '"');
+    gutil.log('could not load task "' + taskName + '"');
+    throw e;
   }
 
   if (taskFunc.private) {
@@ -21,7 +23,8 @@ function loadTask (gulp, taskName, taskPath) {
     try {
       loadTask(gulp, depPath, depRealPath);
     } catch (e) {
-      throw new Error('could not load task dependency "' + depPath + '" for "' + taskName + '"');
+      gutil.log('could not load task dependency "' + depPath + '" for "' + taskName + '"');
+      throw e;
     }
   });
 
@@ -49,11 +52,7 @@ module.exports = function (options) {
   tasks.forEach(function (taskName) {
     bases.forEach(function (basePath) {
       var taskPath = path.join(process.cwd(), basePath, taskName);
-      try {
-        loadTask(gulp, taskName, taskPath);
-      } catch (e) {
-        throw e;
-      }
+      loadTask(gulp, taskName, taskPath);
     });
   });
 };
