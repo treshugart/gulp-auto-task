@@ -48,7 +48,8 @@ module.exports = function (options) {
 
   tasks.forEach(function (taskName) {
     bases.forEach(function (basePath) {
-      var taskPath = path.join(process.cwd(), basePath, taskName);
+      var cwd = path.isAbsolute(basePath) ? '' : process.cwd();
+      var taskPath = path.join(cwd, basePath, taskName);
       try {
         loadTask(gulp, taskName, taskPath);
       } catch (e) {
