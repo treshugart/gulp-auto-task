@@ -5,7 +5,7 @@ function loadTask (gulp, taskName, taskPath) {
   try {
     var taskFunc = require(taskPath);
   } catch (e) {
-    throw new Error ('could not load task "' + taskName + '"');
+    throw new Error ('could not load task "' + taskName + '" because ' + e);
   }
 
   if (taskFunc.private) {
