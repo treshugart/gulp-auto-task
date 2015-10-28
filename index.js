@@ -21,7 +21,7 @@ function loadTask (gulp, taskName, taskPath) {
     try {
       loadTask(gulp, depPath, depRealPath);
     } catch (e) {
-      throw new Error('could not load task dependency "' + depPath + '" for "' + taskName + '"');
+      throw new Error('could not load task dependency "' + depPath + '" for "' + taskName + '" because: ' + e);
     }
   });
 
