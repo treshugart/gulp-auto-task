@@ -5,6 +5,7 @@ var loaded = [];
 
 function loadTask (task, opts) {
   var func;
+  var funcLoadError;
 
   // Don't trace tasks if they've already been loaded.
   if (loaded.indexOf(task) > -1) {
@@ -16,12 +17,13 @@ function loadTask (task, opts) {
     try {
       return func = require(path.join(base, task));
     } catch (e) {
+      funcLoadError = e;
       return false;
     }
   });
 
-  if (!func) {
-    throw new Error ('could not load task "' + task + '" because it could not be found in ' + JSON.stringify(opts.base));
+  if (funcLoadError) {
+    throw new Error ('could not load task "' + task + '" because it could not be found in ' + JSON.stringify(opts.base) + ' because: ' + funcLoadError);
   }
 
   // Flag so we can check for circular deps.
