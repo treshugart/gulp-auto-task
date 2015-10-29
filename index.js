@@ -1,60 +1,80 @@
+var assign = require('object-assign');
 var argv = require('minimist')(process.argv.slice(2));
 var path = require('path');
+var loaded = [];
 
-function loadTask (gulp, taskName, taskPath) {
-  try {
-    var taskFunc = require(taskPath);
-  } catch (e) {
-    throw new Error ('could not load task "' + taskName + '" because ' + e);
-  }
+function loadTask (task, opts) {
+  var func;
 
-  if (taskFunc.private) {
+  // Don't trace tasks if they've already been loaded.
+  if (loaded.indexOf(task) > -1) {
     return;
   }
 
-  if (!taskFunc.dependencies) {
-    taskFunc.dependencies = [];
-  }
-
-  taskFunc.dependencies.forEach(function (depPath) {
-    var depRealPath = path.join(path.dirname(taskPath), depPath);
+  // Find the first matching module.
+  opts.base.some(function (base) {
     try {
-      loadTask(gulp, depPath, depRealPath);
+      return func = require(path.join(base, task));
     } catch (e) {
-      throw new Error('could not load task dependency "' + depPath + '" for "' + taskName + '" because: ' + e);
+      return false;
     }
   });
 
-  if (taskFunc.length > 1) {
-    gulp.task(taskName, taskFunc.dependencies, function (done) {
-      return taskFunc(argv, done);
+  if (!func) {
+    throw new Error ('could not load task "' + task + '" because it could not be found in ' + JSON.stringify(opts.base));
+  }
+
+  // Flag so we can check for circular deps.
+  loaded.push(task);
+
+  // Tasks can be: module.exports = ['dependencies']
+  if (Array.isArray(func)) {
+    var deps = func;
+    func = function (opts, done) {
+      return done();
+    };
+    func.dependencies = deps;
+  }
+
+  // Don't register private tasks.
+  if (func.private) {
+    return;
+  }
+
+  (func.dependencies || []).forEach(function (dep) {
+    try {
+      loadTask(dep, opts);
+    } catch (e) {
+      throw new Error('could not load task dependency "' + dep + '" for "' + task + '" because: ' + e);
+    }
+  });
+
+  if (func.length > 1) {
+    opts.gulp.task(task, func.dependencies, function (done) {
+      return func(argv, done);
     });
   } else {
-    gulp.task(taskName, taskFunc.dependencies, function () {
-      return taskFunc(argv);
+    opts.gulp.task(task, func.dependencies, function () {
+      return func(argv);
     });
   }
 }
 
-module.exports = function (options) {
-  options = options || {};
-  var bases = options.base || './';
-  var gulp = options.gulp || require('gulp');
-  var tasks = argv._;
+module.exports = function (opts) {
+  opts = assign({
+    base: process.cwd(),
+    gulp: require('gulp')
+  }, opts);
 
-  if (typeof bases === 'string') {
-    bases = [bases];
+  if (typeof opts.base === 'string') {
+    opts.base = [opts.base];
   }
 
-  tasks.forEach(function (taskName) {
-    bases.forEach(function (basePath) {
-      var cwd = path.isAbsolute(basePath) ? '' : process.cwd();
-      var taskPath = path.join(cwd, basePath, taskName);
-      try {
-        loadTask(gulp, taskName, taskPath);
-      } catch (e) {
-        throw e;
-      }
-    });
+  opts.base = opts.base.map(function (base) {
+    return path.isAbsolute(base) ? base : path.join(process.cwd(), base);
+  });
+
+  argv._.forEach(function (task) {
+    loadTask(task, opts);
   });
 };
