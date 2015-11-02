@@ -51,15 +51,7 @@ function loadTask (task, opts) {
     }
   });
 
-  if (func.length > 1) {
-    opts.gulp.task(task, func.dependencies, function (done) {
-      return func(argv, done);
-    });
-  } else {
-    opts.gulp.task(task, func.dependencies, function () {
-      return func(argv);
-    });
-  }
+  opts.gulp.task(task, func.dependencies, func.bind(null, argv));
 }
 
 module.exports = function (opts) {
