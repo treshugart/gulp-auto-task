@@ -22,7 +22,7 @@ function loadTask (task, opts) {
     }
   });
 
-  if (funcLoadError) {
+  if (!func && funcLoadError) {
     throw new Error ('could not load task "' + task + '" because it could not be found in ' + JSON.stringify(opts.base) + ' because: ' + funcLoadError);
   }
 
