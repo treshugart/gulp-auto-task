@@ -1,3 +1,5 @@
+'use strict';
+
 var assign = require('object-assign');
 var argv = require('minimist')(process.argv.slice(2));
 var path = require('path');
@@ -22,7 +24,7 @@ function loadTask (task, opts) {
     }
   });
 
-  if (funcLoadError) {
+  if (!func && funcLoadError) {
     throw new Error ('could not load task "' + task + '" because it could not be found in ' + JSON.stringify(opts.base) + ' because: ' + funcLoadError);
   }
 
@@ -51,7 +53,7 @@ function loadTask (task, opts) {
     }
   });
 
-  opts.gulp.task(task, func.dependencies, func.bind(null, argv));
+  opts.gulp.task(task, func.bind(argv));
 }
 
 module.exports = function (opts) {
