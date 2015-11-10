@@ -58,6 +58,12 @@ function loadTask (task, opts) {
 
 function loadTasks () {
   var opts = loadOptions();
+  var tasks = argv._;
+
+  // If no task was specified, load the default task.
+  if (!tasks.length) {
+    tasks.push('default');
+  }
 
   // Can specify the path to the Gulp module.
   opts.gulp = require(resolvePath(opts.gulp));
@@ -71,7 +77,7 @@ function loadTasks () {
   opts.base = opts.base.map(resolvePath);
 
   // Load all specified tasks.
-  argv._.forEach(function (task) {
+  tasks.forEach(function (task) {
     loadTask(task, opts);
   });
 
