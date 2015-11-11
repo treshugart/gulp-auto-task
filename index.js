@@ -25,7 +25,7 @@ function loadOptions () {
 
   // Merge with defaults.
   opts = assign({
-    base: '.',
+    base: 'build/gulp',
     gulp: 'node_modules/gulp'
   }, opts, argv);
 
