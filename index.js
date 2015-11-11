@@ -23,19 +23,35 @@ function loadOptions () {
     }
   }
 
-  return assign({
+  // Merge with defaults.
+  opts = assign({
     base: '.',
     gulp: 'node_modules/gulp'
   }, opts, argv);
+
+  // Can specify the path to the Gulp module.
+  opts.gulp = require(resolvePath(opts.gulp));
+
+  // Base path can be a string or array of base paths.
+  if (typeof opts.base === 'string') {
+    opts.base = [opts.base];
+  }
+
+  // Ensure all paths are normalised.
+  opts.base = opts.base.map(resolvePath);
+
+  return opts;
 }
 
-function loadTask (task, opts) {
+function loadTask (task) {
   var func;
   var funcLoadError;
+  var opts = loadOptions();
 
-  // Don't recurse.
-  if (loaded[task]) { return; }
-  loaded[task] = task;
+  // Don't recurse and also, don't search if we don't have to.
+  if (loaded[task]) {
+    return loaded[task];
+  }
 
   // Find the first matching module.
   opts.base.some(function (base) {
@@ -53,10 +69,10 @@ function loadTask (task, opts) {
   }
 
   // Simple register.
-  opts.gulp.task(task, func);
+  return loaded[task] = func;
 }
 
-function loadTasks () {
+function initTasks () {
   var opts = loadOptions();
   var tasks = argv._;
 
@@ -65,27 +81,14 @@ function loadTasks () {
     tasks.push('default');
   }
 
-  // Can specify the path to the Gulp module.
-  opts.gulp = require(resolvePath(opts.gulp));
-
-  // Base path can be a string or array of base paths.
-  if (typeof opts.base === 'string') {
-    opts.base = [opts.base];
-  }
-
-  // Ensure all paths are normalised.
-  opts.base = opts.base.map(resolvePath);
-
   // Load all specified tasks.
   tasks.forEach(function (task) {
-    loadTask(task, opts);
+    opts.gulp.task(task, loadTask(task));
   });
-
-  // Export the options so they can be used.
-  return opts;
 }
 
 module.exports = {
-  load: loadTasks,
+  init: initTasks,
+  load: loadTask,
   opts: loadOptions
 };
