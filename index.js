@@ -11,7 +11,7 @@ function resolvePath (p) {
   return path.isAbsolute(p) ? p : path.join(process.cwd(), p);
 }
 
-function loadOptions () {
+function loadOptions (mergeWithOpts) {
   var opts;
   var rcFile = path.join(process.cwd(), '.gulprc');
 
@@ -27,7 +27,7 @@ function loadOptions () {
   opts = assign({
     base: 'build/gulp',
     gulp: 'node_modules/gulp'
-  }, opts, argv);
+  }, mergeWithOpts, opts, argv);
 
   // Can specify the path to the Gulp module.
   opts.gulp = require(resolvePath(opts.gulp));
