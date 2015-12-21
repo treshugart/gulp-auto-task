@@ -45,7 +45,7 @@ function loadOptions (mergeWithOpts) {
 
 function loadTask (task) {
   var func;
-  var funcLoadError;
+  var funcLoadErrors = [];
   var opts = loadOptions();
 
   // Don't recurse and also, don't search if we don't have to.
@@ -58,14 +58,15 @@ function loadTask (task) {
     try {
       return func = require(path.join(base, task));
     } catch (e) {
-      funcLoadError = e;
+      funcLoadErrors.push(e.toString());
       return false;
     }
   });
 
   // Try and give helpful load errors.
-  if (!func && funcLoadError) {
-    throw new Error ('could not load task "' + task + '" from ' + JSON.stringify(opts.base) + ' because: ' + funcLoadError);
+  if (!func && funcLoadErrors.length > 0) {
+    var errorMessage = 'could not load task "' + task + '" from\n' + opts.base.join(',\n') + ' because:\n' + funcLoadErrors.join(',\n');
+    throw new Error (errorMessage);
   }
 
   // Simple register.
